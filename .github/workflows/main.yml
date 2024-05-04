@@ -23,13 +23,13 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      -
-        name: Build and test
-        uses: docker/build-push-action@v5
-        with:
-          context: ./batch
-          target: test
-          load: true
+      # - 테스트가 없으므로 제외
+      #   name: Build and test
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ./batch
+      #     target: test
+      #     load: true
       -
         name: Build and push
         uses: docker/build-push-action@v5
