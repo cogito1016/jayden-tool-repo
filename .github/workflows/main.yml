@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+# PWD : /home/runner/work/jayden-tool-repo/jayden-tool-repo
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,20 +24,17 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       -
-        name: Test
-        run: pwd
-      -
         name: Build and test
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./batch
           target: test
           load: true
       -
         name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./batch
           push: true
           target: prod
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
