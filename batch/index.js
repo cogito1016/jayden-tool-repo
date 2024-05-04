@@ -14,6 +14,9 @@ if (process.env.NODE_ENV === "production") {
   dotenv.config({ path: "./.dev.env" });
 }
 
+console.log(`ENV IS : ${process.env.NODE_ENV}`);
+console.log("HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!");
+
 const regularExec = scheduleJob("0 0 8 * * *", () => {
   goalReminderProcess();
 });
