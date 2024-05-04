@@ -37,4 +37,5 @@ jobs:
           context: ./batch
           push: true
           target: prod
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          tags: test/${{ github.event.repository.name }}:latest
+          # tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
