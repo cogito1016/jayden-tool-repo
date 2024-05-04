@@ -37,5 +37,5 @@ jobs:
           context: ./batch
           push: true
           # target: prod #target은.. 아직뭔지모르니 주석처리
-          tags: test_${{ github.event.repository.name }}:latest
+          # tags: test_${{ github.event.repository.name }}:latest
           # tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
