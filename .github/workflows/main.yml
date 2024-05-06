@@ -9,7 +9,6 @@ on:
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-  LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
   LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
@@ -66,6 +65,8 @@ jobs:
         run: |
           aws lightsail get-instance-access-details --instance-name ${{LIGHTSAIL_INSTANCE_NAME}} --output text | awk '{print $5}' | base64 -d | ssh -i ${{LIGHTSAIL_USERNAME}}@${{LIGHTSAIL_HOST}}
           # aws lightsail get-instance-access-details --instance-name ${{LIGHTSAIL_INSTANCE_NAME}} --output text | awk '{print $5}' | base64 -d | ssh -i ${{LIGHTSAIL_SSH_KEY}} ${{LIGHTSAIL_USERNAME}}@${{LIGHTSAIL_HOST}}
+        env:
+          LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
         
       - name: Pull Docker image from Docker Hub
         run: |
