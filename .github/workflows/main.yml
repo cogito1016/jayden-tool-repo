@@ -59,7 +59,13 @@ jobs:
 
       - name: LightSail에 컨테이너 배포를 수행
         run: |
-          sudo docker stop $REPO_NAME
+          if sudo docker ps --format '{{.Names}}' | grep -q "^$REPO_NAME$"; then
+              docker stop $REPO_NAME
+              echo "CONTAINER STOP."
+          else
+              echo "CONTAINER ALREADY STOP."
+          fi
+          
           sudo docker pull $DOCKER_USERNAME/$REPO_NAME:latest
           sudo docker run —rm -d —name $REPO_NAME $DOCKER_USERNAME/$REPO_NAME:latest
         env:
