@@ -44,6 +44,11 @@ jobs:
           # target: prod #target은.. 아직뭔지모르니 주석처리
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
 
+      # - name: Install AWS CLI
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y awscli
+        
       # AWS 인증을 시작합니다.
       - name: AWS 인증하기
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,17 +61,51 @@ jobs:
       - name: AWS Lightsail에 연결되었는지 확인
         run: aws configure list
 
-
-      - name: LightSail에 컨테이너 배포를 수행
+      - name: AWS Lightsail login
         run: |
-          if sudo docker ps --format '{{.Names}}' | grep -q "^${REPO_NAME}$"; then
-              sudo docker stop ${REPO_NAME}
-              echo "CONTAINER STOP."
-          else
-              echo "CONTAINER ALREADY STOP."
-          fi
-          sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest | sudo docker run --rm -d --name ${REPO_NAME} ${DOCKER_USERNAME}/${REPO_NAME}:latest
+          aws lightsail get-instance-access-details --instance-name ${{LIGHTSAIL_INSTANCE_NAME}} --output text | awk '{print $5}' | base64 -d | ssh -i ${{LIGHTSAIL_USERNAME}}@${{LIGHTSAIL_HOST}}
+          # aws lightsail get-instance-access-details --instance-name ${{LIGHTSAIL_INSTANCE_NAME}} --output text | awk '{print $5}' | base64 -d | ssh -i ${{LIGHTSAIL_SSH_KEY}} ${{LIGHTSAIL_USERNAME}}@${{LIGHTSAIL_HOST}}
+        
+      - name: Pull Docker image from Docker Hub
+        run: |
+          sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
           REPO_NAME: ${{ github.event.repository.name }}
+        
+      - name: Run Docker container on Lightsail instance
+        run: |
+          sudo docker run --rm -d --name ${REPO_NAME} ${DOCKER_USERNAME}/${REPO_NAME}:latest
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
+          REPO_NAME: ${{ github.event.repository.name }}
+
+
+      # - name: LightSail에 컨테이너 배포를 수행
+      #   run: |
+      #     if sudo docker ps --format '{{.Names}}' | grep -q "^${REPO_NAME}$"; then
+      #         sudo docker stop ${REPO_NAME}
+      #         echo "CONTAINER STOP."
+      #     else
+      #         echo "CONTAINER ALREADY STOP."
+      #     fi
+      #     sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest
+      #     sudo docker run --rm -d --name ${REPO_NAME} ${DOCKER_USERNAME}/${REPO_NAME}:latest
+      #   env:
+      #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
+      #     REPO_NAME: ${{ github.event.repository.name }}
+
+
+          
+      # - name: Push and Deploy # 이미지 푸시 및 배포
+      #   run: |
+      #     service_name=${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}
+      #     aws lightsail push-container-image \
+      #       --region ${{ env.AWS_REGION }} \
+      #       --service-name ${service_name} \
+      #       --label ${service_name} \
+      #       --image ${service_name}:release
+      #     aws lightsail get-container-images --service-name ${service_name} | jq --raw-output ".containerImages[0].image" > image.txt
+      #     jq --arg image $(cat image.txt) '.containers.app.image = $image' container.template.json > container.json
+      #     aws lightsail create-container-service-deployment --service-name ${service_name} --cli-input-json file://$(pwd)/container.json
         
