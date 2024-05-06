@@ -9,6 +9,7 @@ on:
 env:
   LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
   LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+  LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
   LIGHTSAIL_USERNAME: ubuntu
   AWS_REGION: ap-northeast-2
 
