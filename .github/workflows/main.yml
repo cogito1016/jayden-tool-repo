@@ -56,22 +56,23 @@ jobs:
       - name: AWS 인증이 완료 확인
         run: aws configure list
         
-      - name: AWS Lightsail CLI 테스트
-        run: |
-          aws lightsail get-instances
-        env:
-          LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
-          LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-          LIGHTSAIL_USERNAME: ubuntu
-
-      # - name: AWS Lightsail login
+      # - name: AWS Lightsail CLI 테스트
       #   run: |
-      #     aws lightsail get-instance-access-details --instance-name ${LIGHTSAIL_INSTANCE_NAME} --output text | awk '{print $5}' | base64 -d | ssh -i ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST}
-      #     # aws lightsail get-instance-access-details --instance-name ${LIGHTSAIL_INSTANCE_NAME} --output text | awk '{print $5}' | base64 -d | ssh -i ${LIGHTSAIL_SSH_KEY} ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST}
+      #     aws lightsail get-instances
       #   env:
       #     LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
       #     LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
       #     LIGHTSAIL_USERNAME: ubuntu
+
+      - name: AWS Lightsail access and image load
+        run: |
+          ssh ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
+        env:
+          LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
+          LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+          LIGHTSAIL_USERNAME: ubuntu
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
+          REPO_NAME: ${{ github.event.repository.name }}
         
       # - name: Pull Docker image from Docker Hub
       #   run: |
