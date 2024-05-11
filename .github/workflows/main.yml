@@ -44,17 +44,17 @@ jobs:
           # target: prod #target은.. 아직뭔지모르니 주석처리
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
         
-      # AWS 인증을 시작합니다.
-      - name: AWS 인증하기
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # # AWS 인증을 시작합니다.
+      # - name: AWS 인증하기
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: ${{ env.AWS_REGION }}
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      # AWS 인증이 완료되었는지 테스트합니다.
-      - name: AWS 인증이 완료 확인
-        run: aws configure list
+      # # AWS 인증이 완료되었는지 테스트합니다.
+      # - name: AWS 인증이 완료 확인
+      #   run: aws configure list
         
       # - name: AWS Lightsail CLI 테스트
       #   run: |
