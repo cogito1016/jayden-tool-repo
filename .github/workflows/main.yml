@@ -65,15 +65,27 @@ jobs:
       #     LIGHTSAIL_USERNAME: ubuntu
 
       - name: AWS Lightsail access and image load
-        run: |
-          ssh ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'sudo -i ${LIGHTSAIL_SSH_KEY} docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
+        run: |  
+          echo "${LIGHTSAIL_SSH_KEY}" >> $HOME/key.pem
+          chmod 400 $HOME/key.pem
+          ssh -i $HOME/key.pem -o StrictHostKeyChecking=no ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
         env:
-          LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USERNAME: ubuntu
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
           REPO_NAME: ${{ github.event.repository.name }}
           LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+
+      # - name: AWS Lightsail access and image load
+      #   run: |
+      #     ssh ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'sudo -i ${LIGHTSAIL_SSH_KEY} docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
+      #   env:
+      #     LIGHTSAIL_INSTANCE_NAME: ${{ secrets.LIGHTSAIL_INSTANCE_NAME }}
+      #     LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+      #     LIGHTSAIL_USERNAME: ubuntu
+      #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} 
+      #     REPO_NAME: ${{ github.event.repository.name }}
+      #     LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         
       # - name: Pull Docker image from Docker Hub
       #   run: |
