@@ -64,11 +64,11 @@ jobs:
       #     LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
       #     LIGHTSAIL_USERNAME: ubuntu
 
-      - uses: actions/checkout@v2 
+      # - uses: actions/checkout@v2 
       - name: AWS Lightsail access and image load
         run: |  
           echo "$LIGHTSAIL_SSH_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
+          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USERNAME: ubuntu
