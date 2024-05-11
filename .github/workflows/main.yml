@@ -67,7 +67,7 @@ jobs:
       - name: AWS Lightsail access and image load
         run: |  
           echo ${LIGHTSAIL_SSH_KEY} >> $HOME/key.pem
-          chmod 400 $HOME/key.pem
+          chmod 600 $HOME/key.pem
           ssh -i $HOME/key.pem -o StrictHostKeyChecking=no ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} 'docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest'
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
