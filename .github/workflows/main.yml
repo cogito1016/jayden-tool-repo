@@ -64,6 +64,7 @@ jobs:
       #     LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
       #     LIGHTSAIL_USERNAME: ubuntu
 
+      - uses: actions/checkout@v2 
       - name: AWS Lightsail access and image load
         run: |  
           echo "$LIGHTSAIL_SSH_KEY" > private_key && chmod 600 private_key
