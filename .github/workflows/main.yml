@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "$ENV_DEV" >> ./batch/.dev.env
           echo "$ENV_PROD" >> ./batch/.prod.env
-          echo "$MEMBER_OBJECT_LSIT" >> ./batch/processes/goal-reminder-bot/MemberObjectList.js
+          echo "$MEMBER_OBJECT_LSIT" > ./batch/processes/goal-reminder-bot/MemberObjectList.js
         env:
           ENV_DEV: ${{ secrets.ENV_DEV }}
           ENV_PROD: ${{ secrets.ENV_PROD }}
