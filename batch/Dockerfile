@@ -11,7 +11,7 @@ ARG NODE_VERSION=20.12.2
 FROM node:${NODE_VERSION}-alpine
 
 #타임존 설정
-ENV TZ=Asia/Seoul
+ENV TZ Asia/Seoul
 
 # Use production node environment by default. 
 # compose.yml에 설정되어있으므로 주석
