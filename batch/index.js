@@ -19,6 +19,6 @@ sendMessageToTestChannel({
   text: `Process is started | ENV IS : ${process.env.NODE_ENV}`,
 });
 
-const regularExec = scheduleJob("12 12 * * *", () => {
+const regularExec = scheduleJob("14 12 * * *", () => {
   goalReminderProcess();
 });
