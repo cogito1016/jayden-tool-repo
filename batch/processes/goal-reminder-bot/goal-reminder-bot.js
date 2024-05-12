@@ -12,7 +12,7 @@ export function goalReminderProcess() {
 
   members.forEach((member) => {
     const message = {
-      text: `<@${member.name}>님, 진행중인 프로젝트 목록입니다.`,
+      text: `<@${member.slackId}>님, 진행중인 프로젝트 목록입니다.`,
       attachments: member.project.map((project) => ({
         text: project,
       })),
