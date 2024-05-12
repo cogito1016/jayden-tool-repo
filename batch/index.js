@@ -19,6 +19,6 @@ sendMessageToTestChannel({
   text: `Process is started | ENV IS : ${process.env.NODE_ENV} | WebhookURL : ${process.env.GOAL_STUDY_SLACK_WEBHOOK}`,
 });
 
-const regularExec = scheduleJob("28 12 * * *", () => {
+const regularExec = scheduleJob("15 13 * * *", () => {
   goalReminderProcess();
 });
