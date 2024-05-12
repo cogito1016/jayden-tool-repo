@@ -42,10 +42,21 @@ jobs:
           # target: prod #target은.. 아직뭔지모르니 주석처리
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
 
-      - name: AWS Lightsail access and image load
+      - name: AWS Lightsail access and delete image and container stop
         run: |
           echo "$LIGHTSAIL_SSH_KEY" > private_key && chmod 600 private_key
-          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} "sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest | sudo docker run --rm -d --name jayden-tool-repo cogito1016/jayden-tool-repo:latest"
+          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} "sudo docker stop ${REPO_NAME} | sudo docker rmi ${DOCKER_USERNAME}/${REPO_NAME}"
+        env:
+          LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+          LIGHTSAIL_USERNAME: ubuntu
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+
+      - name: AWS Lightsail access and image load and container run
+        run: |
+          echo "$LIGHTSAIL_SSH_KEY" > private_key && chmod 600 private_key
+          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} "sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest | sudo docker run --rm -d --name ${REPO_NAME} ${DOCKER_USERNAME}/${REPO_NAME}:latest"
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USERNAME: ubuntu
