@@ -45,7 +45,7 @@ jobs:
       - name: AWS Lightsail access and image load
         run: |
           echo "$LIGHTSAIL_SSH_KEY" > private_key && chmod 600 private_key
-          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} "sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest"
+          ssh -v -o StrictHostKeyChecking=no -i private_key ${LIGHTSAIL_USERNAME}@${LIGHTSAIL_HOST} "sudo docker pull ${DOCKER_USERNAME}/${REPO_NAME}:latest | sudo docker run --rm -d --name jayden-tool-repo cogito1016/jayden-tool-repo:latest"
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USERNAME: ubuntu
