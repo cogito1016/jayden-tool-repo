@@ -1,6 +1,7 @@
 import { scheduleJob } from "node-schedule";
 import { goalReminderProcess } from "./processes/goal-reminder-bot/goal-reminder-bot.js";
 import * as dotenv from "dotenv";
+import { sendMessageToTestChannel } from "./lib/slack_alarm.js";
 
 process.env.NODE_ENV =
   process.env.NODE_ENV &&
@@ -14,8 +15,9 @@ if (process.env.NODE_ENV === "production") {
   dotenv.config({ path: "./.dev.env" });
 }
 
-console.log(`ENV IS : ${process.env.NODE_ENV}`);
-console.log("HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!");
+sendMessageToTestChannel({
+  text: `Process is started | ENV IS : ${process.env.NODE_ENV}`,
+});
 
 const regularExec = scheduleJob("0 0 8 * * *", () => {
   goalReminderProcess();
