@@ -10,9 +10,9 @@ process.env.NODE_ENV =
     : "development";
 
 if (process.env.NODE_ENV === "production") {
-  dotenv.config({ path: "./.prod.env" });
+  dotenv.config({ path: "./secret/env/.prod.env" });
 } else {
-  dotenv.config({ path: "./.dev.env" });
+  dotenv.config({ path: "./secret/env/.dev.env" });
 }
 
 sendMessageToTestChannel({
