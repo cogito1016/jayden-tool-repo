@@ -1,5 +1,5 @@
 import { sendMessageToTestChannel } from "../../lib/slack_alarm.js";
-import { MemberObjectList } from "./MemberObjectList.js";
+import { MemberObjectList } from "../../secret/object/MemberObjectList.js";
 
 export function goalReminderProcess() {
   sendMessageToTestChannel({
