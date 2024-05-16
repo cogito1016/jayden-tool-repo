@@ -3,5 +3,9 @@
 ## 인증, 리다이렉트, 쿠키와 같은 요청처리 지원
 
 # 라이브러리 적재
-import urllib.request
+import urllib.request as req
+
+# HTMl 가져오기
+url = "http://finance.naver.com/marketindex/"
+res = req.urlopen(url)
 
