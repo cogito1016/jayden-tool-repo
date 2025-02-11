@@ -26,7 +26,6 @@ WORKDIR /usr/src/app
 
 # Copy the rest of the source files into the image.
 COPY . .
-COPY ./secret/env/* ./secret/env/*  
 
 RUN npm install
 
