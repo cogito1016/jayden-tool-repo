@@ -11,7 +11,7 @@ ARG NODE_VERSION=20.12.2
 FROM node:${NODE_VERSION}-alpine
 
 #서울로 타임존 설정
-RUN apk add --no-cache libc6-compat tini tzdata
+RUN apk add --no-cache tzdata
 ENV TZ=Asia/Seoul
 
 # Use production node environment by default. 
@@ -28,10 +28,6 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN npm install
-
-# tini를 ENTRYPOINT로 설정
-ENTRYPOINT ["/sbin/tini", "--"]
-
 
 # Expose the port that the application listens on. 
 EXPOSE 3000
