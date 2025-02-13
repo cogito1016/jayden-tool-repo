@@ -22,5 +22,3 @@ sendMessageToTestChannel({
 const regularExec = scheduleJob("0 8 * * *", () => {
   goalReminderProcess();
 });
-
-setInterval(() => {}, 1000 * 60 * 60); // 1시간마다 빈 함수 실행 (컨테이너 유지)
