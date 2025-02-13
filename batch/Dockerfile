@@ -30,7 +30,7 @@ COPY . .
 RUN npm install
 
 # tini 설치
-RUN apt-get update && apt-get install -y tini
+# RUN apt-get update && apt-get install -y tini
 
 # tini를 ENTRYPOINT로 설정
 ENTRYPOINT [ "/usr/bin/tini","--" ]
