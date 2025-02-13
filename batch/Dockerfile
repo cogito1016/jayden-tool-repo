@@ -29,11 +29,12 @@ COPY . .
 
 RUN npm install
 
-# tini 설치
-# RUN apt-get update && apt-get install -y tini
+# tini 바이너리 다운로드 및 실행 권한 부여
+ADD https://github.com/krallin/tini/releases/latest/download/tini /sbin/tini
+RUN chmod +x /sbin/tini
 
 # tini를 ENTRYPOINT로 설정
-ENTRYPOINT [ "/usr/bin/tini","--" ]
+ENTRYPOINT [ "/sbin/tini","--" ]
 
 
 # Expose the port that the application listens on. 
