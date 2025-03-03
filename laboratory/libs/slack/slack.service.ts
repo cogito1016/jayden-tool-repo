@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { WebClient } from '@slack/web-api';
+import { MessageAttachment, WebClient } from '@slack/web-api';
+import { conversationId, token } from 'env/Token';
 
 @Injectable()
 export class SlackService {
@@ -7,19 +8,20 @@ export class SlackService {
 
   constructor() {
     // Read a token from the environment variables
-    const token = 'TOKEN_SECRET';
 
     // Initialize
     this.web = new WebClient(token);
   }
 
-  public async postMsg() {
-    const conversationId = 'CONVERSATION_ID_SECRET';
-
+  public async postMsg(msg: {
+    text: string;
+    attachments: MessageAttachment[];
+  }) {
     await (async () => {
       const result = await this.web.chat.postMessage({
-        text: 'Hello world!',
+        text: msg.text,
         channel: conversationId,
+        attachments: msg.attachments,
       });
 
       // The result contains an identifier for the message, `ts`.

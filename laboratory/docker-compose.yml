@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=jobs
+      - PORT=3000
+      - SLACK_BOT_TOKEN=your-slack-token
+      - SLACK_CHANNEL_ID=your-channel-id
+    ports:
+      - '3000:3000'
+
+  laboratory:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=laboratory
+      - PORT=3001
+    ports:
+      - '3001:3001'
