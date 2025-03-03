@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { MemberObjectList } from 'env/MemberObjectList';
 import { SlackService } from 'libs/slack/slack.service';
 @Injectable()
@@ -8,7 +8,7 @@ export class ReminderService {
 
   constructor(private readonly slackService: SlackService) {}
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron('0 0 8 * * 1') // 매주 월요일 오전 8시
   handleCron(): void {
     this.logger.debug('Called every 30 seconds');
 
