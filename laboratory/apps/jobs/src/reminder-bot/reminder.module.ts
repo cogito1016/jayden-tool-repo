@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ReminderService } from './reminder.service';
+import { SlackModule } from 'libs/slack/slack.module';
 
 @Module({
-  imports: [],
+  imports: [SlackModule],
   controllers: [],
   providers: [ReminderService],
 })
