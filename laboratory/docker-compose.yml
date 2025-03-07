@@ -22,3 +22,13 @@ services:
       - PORT=3002
     ports:
       - '3002:3002'
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=api
+      - PORT=3001
+    ports:
+      - '3001:3001'

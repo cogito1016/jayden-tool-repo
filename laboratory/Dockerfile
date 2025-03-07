@@ -15,6 +15,7 @@ COPY env ./env
 RUN npm ci
 RUN npm run build:jobs
 RUN npm run build:laboratory
+RUN npm run build:api
 
 # Production stage
 FROM node:20-alpine
@@ -30,6 +31,9 @@ COPY --from=builder /app/env ./env
 # Add environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV API_PORT=3001
+ENV JOBS_PORT=3002
+ENV LABORATORY_PORT=3002
 
 # Start script for each application
 COPY docker-entrypoint.sh /

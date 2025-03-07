@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/laboratory",
   "projects": {
+    "api": {
+      "type": "application",
+      "root": "apps/api",
+      "entryFile": "main",
+      "sourceRoot": "apps/api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api/tsconfig.app.json"
+      }
+    },
     "jobs": {
       "type": "application",
       "root": "apps/jobs",
