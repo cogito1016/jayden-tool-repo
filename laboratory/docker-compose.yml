@@ -19,6 +19,6 @@ services:
       dockerfile: Dockerfile
     environment:
       - APP_NAME=laboratory
-      - PORT=3001
+      - PORT=3002
     ports:
-      - '3001:3001'
+      - '3002:3002'
