@@ -14,16 +14,20 @@ interface SlackMessage {
   ts: string;
 }
 
-export interface SlackWebhookSuccessResponse {
-  ok: true;
+export interface SlackWebhookSuccessResponse extends BasicResponse {
   channel: string;
   ts: string;
   message: SlackMessage;
 }
 
-export interface SlackWebhookErrorResponse {
-  ok: false;
+export interface SlackWebhookErrorResponse extends BasicResponse {
   error: string;
+}
+
+export interface BasicResponse {
+  ok: boolean;
+  type?: string;
+  challenge?: string;
 }
 
 export type SlackWebhookResponse =
