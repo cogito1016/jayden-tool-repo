@@ -1,5 +1,6 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiService } from './api.service';
+import { SlackWebhookResponse } from 'libs/slack/types/slack-webhook.type';
 
 @Controller('reminder-bot')
 export class ApiController {
@@ -11,7 +12,7 @@ export class ApiController {
   }
 
   @Post('chat')
-  getReminder(): string {
-    return this.apiService.getReminder();
+  processUserReponse(@Body() webhookData: SlackWebhookResponse): void {
+    this.apiService.processUserReponse(webhookData);
   }
 }
