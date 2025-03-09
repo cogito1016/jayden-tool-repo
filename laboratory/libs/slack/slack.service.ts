@@ -1,33 +1,38 @@
-import { Injectable } from '@nestjs/common';
-import { MessageAttachment, WebClient } from '@slack/web-api';
-import { conversationId, token } from 'env/Token';
+import { Injectable, Logger } from '@nestjs/common';
+import { WebClient } from '@slack/web-api';
+import { testConversationId, token } from 'env/Token';
+import {
+  SlackMessageRequest,
+  SlackMessageResponse,
+} from './types/slack-post-message';
 
 @Injectable()
 export class SlackService {
-  web: WebClient;
+  private readonly logger = new Logger(SlackService.name);
+  private readonly web: WebClient;
 
   constructor() {
-    // Read a token from the environment variables
-
-    // Initialize
     this.web = new WebClient(token);
   }
 
-  public async postMsg(msg: {
-    text: string;
-    attachments: MessageAttachment[];
-  }) {
-    await (async () => {
-      const result = await this.web.chat.postMessage({
+  public async postMsg(
+    msg: SlackMessageRequest,
+  ): Promise<SlackMessageResponse> {
+    try {
+      const result = (await this.web.chat.postMessage({
         text: msg.text,
-        channel: conversationId,
+        channel: msg.conversationId ?? testConversationId,
         attachments: msg.attachments,
-      });
+      })) as SlackMessageResponse;
 
-      // The result contains an identifier for the message, `ts`.
-      console.log(
-        `Successfully send message ${result.ts} in conversation ${conversationId}`,
+      this.logger.log(
+        `Message sent successfully - ID: ${result.ts}, Channel: ${result.channel}`,
       );
-    })();
+
+      return result;
+    } catch (error) {
+      this.logger.error('Failed to send Slack message:', error);
+      throw error;
+    }
   }
 }

@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { SlackWebhookResponse } from 'libs/slack/types/slack-webhook.type';
+import {
+  SlackWebhookEvent,
+  URL_VERIFICATION,
+} from 'libs/slack/types/slack-webhook-message';
 
 @Injectable()
 export class ApiService {
-  processUserReponse(webhookData: SlackWebhookResponse) {
-    if (!webhookData.ok) {
-      console.error('Slack 웹훅 오류:', webhookData.error);
-      return;
+  processUserReponse(webhookData: SlackWebhookEvent) {
+    if (webhookData.type === URL_VERIFICATION) {
+      return webhookData.challenge;
     }
 
-    const { channel, ts, message } = webhookData;
-
-    console.log('Slack 채널:', channel);
-    console.log('Slack 메시지 ID:', ts);
-    console.log('Slack 메시지:', message);
+    console.log(webhookData);
+    return null;
   }
   getHello(): string {
     return 'Hello World!';

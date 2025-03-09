@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { ApiService } from './api.service';
-import { SlackWebhookResponse } from 'libs/slack/types/slack-webhook.type';
-import { URL_VERIFICATION } from 'libs/slack/constants/slack-message-type';
+import { SlackWebhookEvent } from 'libs/slack/types/slack-webhook-message';
 
 @Controller('reminder-bot')
 export class ApiController {
@@ -13,10 +12,8 @@ export class ApiController {
   }
 
   @Post('chat')
-  processUserReponse(@Body() webhookData: SlackWebhookResponse): void | string {
-    if (webhookData.type === URL_VERIFICATION) {
-      return webhookData.challenge;
-    }
+  processUserResponse(@Body() webhookData: SlackWebhookEvent): void | string {
+    // 일반 메시지 이벤트 처리
     this.apiService.processUserReponse(webhookData);
   }
 }
