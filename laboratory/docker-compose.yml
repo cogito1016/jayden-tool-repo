@@ -9,6 +9,7 @@ services:
     environment:
       - APP_NAME=jobs
       - PORT=3000
+      - TZ=Asia/Seoul
     ports:
       - '3000:3000'
 
