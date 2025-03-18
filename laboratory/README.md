@@ -39,3 +39,7 @@ docker compose --env-file env/.env.production up -d --build
 
 이렇게 하면 `env/.env.production` 파일의 환경변수를 사용하여 MySQL이 실행됩니다.
 ```
+
+## 로컬실행
+
+- npm run api:local
