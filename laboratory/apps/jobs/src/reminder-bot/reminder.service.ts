@@ -9,7 +9,8 @@ export class ReminderService {
 
   constructor(private readonly slackService: SlackService) {}
 
-  @Cron('0 0 8 * * 1') // 매주 월요일 오전 8시
+  // @Cron('0 0 8 * * 1') // 매주 월요일 오전 8시
+  @Cron('0 0 8 * * *') //매일 오전 8시 (테스트를 위해 임시)
   handleCron(): void {
     this.logger.debug('Called every 30 seconds');
 

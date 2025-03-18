@@ -20,6 +20,10 @@ RUN npm run build:api
 # Production stage
 FROM node:20-alpine
 
+# 타임존 설정을 위한 패키지 설치 및 설정
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Seoul
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
