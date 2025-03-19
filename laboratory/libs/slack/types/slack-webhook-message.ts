@@ -3,8 +3,8 @@ export const URL_VERIFICATION = 'url_verification';
 export const MESSAGE = 'message';
 export const EVENT_CALLBACK = 'event_callback';
 
-// 리마인더봇 ID를 상수로 정의 (환경변수보다 직접 정의가 더 명확함)
-export const REMINDER_BOT_ID = 'U070BFA5CQ7'; // 실제 리마인더봇 ID
+// 리마인더봇 ID를 상수로 정의
+export const REMINDER_BOT_ID = process.env.REMINDER_BOT_ID;
 
 interface SlackEventBase {
   token: string;
