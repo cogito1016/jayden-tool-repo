@@ -7,4 +7,11 @@ export class MemberRepository extends BaseRepository<MemberEntity> {
   constructor() {
     super('member', 'idx');
   }
+  async findBySlackMemberId(
+    slackMemberId: string,
+  ): Promise<MemberEntity | undefined> {
+    return this.knex(this.tableName)
+      .where('slack_member_id', slackMemberId)
+      .first() as Promise<MemberEntity | undefined>;
+  }
 }

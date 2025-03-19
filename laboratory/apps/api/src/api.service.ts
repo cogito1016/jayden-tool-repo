@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConversationLogService } from 'libs/domains/conversation-log/services/conversation-log.service';
 import { MemberEntity } from 'libs/domains/member/entities/member.entity';
 import { MemberService } from 'libs/domains/member/services/member.service';
 import {
@@ -8,9 +9,12 @@ import {
 
 @Injectable()
 export class ApiService {
-  constructor(private readonly memberService: MemberService) {}
+  constructor(
+    private readonly memberService: MemberService,
+    private readonly conversationLogService: ConversationLogService,
+  ) {}
 
-  processUserReponse(webhookData: SlackWebhookEvent) {
+  async processUserReponse(webhookData: SlackWebhookEvent) {
     if (webhookData.type === URL_VERIFICATION) {
       console.log('URL 검증 이벤트');
       console.log(webhookData.challenge);
@@ -18,6 +22,7 @@ export class ApiService {
     }
 
     console.log(webhookData);
+    await this.conversationLogService.processWebhookEvent(webhookData);
     return null;
   }
   getHello(): string {

@@ -12,8 +12,10 @@ export class ApiController {
   }
 
   @Post('chat')
-  processUserResponse(@Body() webhookData: SlackWebhookEvent): void | string {
+  async processUserResponse(
+    @Body() webhookData: SlackWebhookEvent,
+  ): Promise<void | string> {
     // 일반 메시지 이벤트 처리
-    this.apiService.processUserReponse(webhookData);
+    await this.apiService.processUserReponse(webhookData);
   }
 }
