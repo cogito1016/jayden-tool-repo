@@ -34,4 +34,15 @@ export class ConversationLogRepository extends BaseRepository<ConversationLog> {
       .where('thread_ts', threadTs)
       .orderBy('message_ts', 'asc') as Promise<ConversationLog[]>;
   }
+
+  // 스레드의 원본 메시지 조회 (스레드 타임스탬프와 동일한 메시지 타임스탬프를 가진 메시지)
+  async findThreadOriginMessage(
+    threadTs: string,
+  ): Promise<ConversationLog | null> {
+    const messages = await this.knex(this.tableName)
+      .where('message_ts', threadTs)
+      .limit(1);
+
+    return messages.length > 0 ? (messages[0] as ConversationLog) : null;
+  }
 }
