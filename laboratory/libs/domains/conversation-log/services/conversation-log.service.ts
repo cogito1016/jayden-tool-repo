@@ -36,48 +36,62 @@ export class ConversationLogService {
     return extractAllMentionedUsers(messageEvent.text).length > 0;
   }
 
-  // 스레드의 타겟 사용자 식별 (리마인더봇이 언급한 사용자)
-  private async identifyThreadTargetUser(
+  // 리마인더 메시지의 타겟 사용자를 식별하는 로직
+  private async identifyReminderTargetUser(
     threadTs: string,
-  ): Promise<string | null> {
+    currentUserId: string,
+  ): Promise<{ targetUserId: string | null; isCurrentUserTarget: boolean }> {
     try {
-      // 스레드의 원본 메시지 조회
+      // 1. 스레드 원본 메시지 조회
       const originMessage =
         await this.conversationLogRepository.findThreadOriginMessage(threadTs);
 
-      // 원본 메시지가 없거나 리마인더봇 메시지가 아닌 경우
-      if (!originMessage || !originMessage.is_reminder_thread) {
-        return null;
-      }
+      this.logger.verbose('[타겟 식별] 스레드 원본 메시지 조회 결과', {
+        found: !!originMessage,
+        message_ts: originMessage?.message_ts,
+        thread_ts: threadTs,
+      });
 
-      // mentioned_user 사용 (첫 번째 멘션된 사용자)
-      if (originMessage.mentioned_user) {
-        return originMessage.mentioned_user;
-      }
+      if (originMessage) {
+        let targetUserId: string | null = null;
 
-      // mentioned_users가 있으면 파싱해서 첫 번째 요소 반환
-      if (originMessage.mentioned_users) {
-        try {
-          const mentionedUsers = JSON.parse(originMessage.mentioned_users);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          return Array.isArray(mentionedUsers) && mentionedUsers.length > 0
-            ? mentionedUsers[0]
-            : null;
-        } catch (err) {
-          this.logger.warn('Failed to parse mentioned_users JSON', {
-            mentioned_users: originMessage.mentioned_users,
-            error: err.message,
-          });
+        // 2. 원본 메시지에서 멘션된 사용자 확인
+        if (originMessage.mentioned_user) {
+          targetUserId = originMessage.mentioned_user;
+        } else if (originMessage.mentioned_users) {
+          try {
+            const mentionedUsers = JSON.parse(originMessage.mentioned_users);
+            if (Array.isArray(mentionedUsers) && mentionedUsers.length > 0) {
+              targetUserId = mentionedUsers[0];
+            }
+          } catch (err) {
+            this.logger.warn('[타겟 식별] mentioned_users JSON 파싱 실패', {
+              mentioned_users: originMessage.mentioned_users,
+              error: err.message,
+            });
+          }
         }
+
+        // 3. 결과 반환
+        const isCurrentUserTarget = targetUserId === currentUserId;
+
+        this.logger.verbose('[타겟 식별] 타겟 사용자 식별 결과', {
+          target_user_id: targetUserId,
+          current_user_id: currentUserId,
+          is_current_user_target: isCurrentUserTarget,
+        });
+
+        return { targetUserId, isCurrentUserTarget };
       }
 
-      return null;
+      // 원본 메시지를 찾지 못한 경우
+      return { targetUserId: null, isCurrentUserTarget: false };
     } catch (error) {
       this.logger.error(
-        `Failed to identify thread target user: ${error.message}`,
+        `[타겟 식별] 타겟 사용자 식별 중 오류: ${error.message}`,
         error.stack,
       );
-      return null;
+      return { targetUserId: null, isCurrentUserTarget: false };
     }
   }
 
@@ -89,6 +103,13 @@ export class ConversationLogService {
 
     const messageEvent = event.event;
 
+    // 리마인더봇 ID 로깅 (디버깅용)
+    this.logger.verbose('[이벤트 처리] 리마인더봇 ID 확인', {
+      reminder_bot_id: REMINDER_BOT_ID,
+      bot_id_type: typeof REMINDER_BOT_ID,
+      bot_id_length: REMINDER_BOT_ID ? REMINDER_BOT_ID.length : 0,
+    });
+
     // 봇 메시지 처리 (리마인더봇 메시지는 저장, 다른 봇은 무시)
     const isReminderBot = isReminderBotMessage(messageEvent);
     this.logger.verbose(
@@ -96,6 +117,7 @@ export class ConversationLogService {
       {
         bot_id: messageEvent.bot_id,
         reminder_bot_id: REMINDER_BOT_ID,
+        actual_match: messageEvent.bot_id === REMINDER_BOT_ID,
       },
     );
 
@@ -115,50 +137,20 @@ export class ConversationLogService {
       const firstMentionedUser =
         mentionedUsers.length > 0 ? mentionedUsers[0] : null;
 
-      // 리마인더봇 타겟 사용자 식별
+      // 리마인더 타겟 사용자 식별 (단순화된 로직)
       let reminderTargetUser: string | null = null;
       let isTargetInThread = false;
 
-      // 디버깅을 위한 추가 로깅
-      this.logger.verbose('[이벤트 처리] 처리 중인 메시지 정보', {
-        user: messageEvent.user,
-        is_thread: isThreadMessage(messageEvent),
-        thread_ts: messageEvent.thread_ts,
-        is_reminder_bot: isReminderBot,
-        mentioned_users: mentionedUsers,
-        message_text: messageEvent.text,
-        blocks: messageEvent.blocks,
-      });
-
-      // 스레드 메시지인 경우, 원본 스레드의 타겟 사용자 식별
-      if (isThreadMessage(messageEvent)) {
-        if (messageEvent.thread_ts) {
-          this.logger.verbose('[이벤트 처리] 스레드 원본 메시지 조회 시도', {
-            thread_ts: messageEvent.thread_ts,
-          });
-
-          reminderTargetUser = await this.identifyThreadTargetUser(
+      if (isThreadMessage(messageEvent) && messageEvent.thread_ts) {
+        // 새로운 타겟 사용자 식별 메서드 사용
+        const { targetUserId, isCurrentUserTarget } =
+          await this.identifyReminderTargetUser(
             messageEvent.thread_ts,
+            messageEvent.user,
           );
 
-          // 타겟 사용자 식별 결과 로깅
-          this.logger.verbose('[이벤트 처리] 스레드 타겟 사용자 식별 결과', {
-            thread_ts: messageEvent.thread_ts,
-            reminder_target_user: reminderTargetUser,
-            current_user: messageEvent.user,
-          });
-
-          // 현재 메시지 작성자가 타겟 사용자와 동일한지 확인
-          isTargetInThread =
-            !!reminderTargetUser && reminderTargetUser === messageEvent.user;
-
-          this.logger.verbose('[이벤트 처리] 타겟 사용자 비교 결과', {
-            is_target_in_thread: isTargetInThread,
-            reminder_target_user: reminderTargetUser,
-            current_user: messageEvent.user,
-            equal: reminderTargetUser === messageEvent.user,
-          });
-        }
+        reminderTargetUser = targetUserId;
+        isTargetInThread = isCurrentUserTarget;
       } else if (isReminderBot) {
         // 리마인더봇 원본 메시지인 경우, 타겟 사용자 바로 추출
         this.logger.verbose('[이벤트 처리] 리마인더봇 원본 메시지 분석', {
