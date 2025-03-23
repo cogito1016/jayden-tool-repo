@@ -3,7 +3,6 @@ export const URL_VERIFICATION = 'url_verification';
 export const MESSAGE = 'message';
 export const EVENT_CALLBACK = 'event_callback';
 
-// 리마인더봇 ID를 상수로 정의
 export const REMINDER_BOT_ID = process.env.REMINDER_BOT_ID;
 
 interface SlackEventBase {
@@ -91,7 +90,26 @@ export const isReminderBotParent = (event: SlackMessageEvent): boolean => {
 // 리마인더봇이 생성한 원본 메시지인지 확인하는 함수
 export const isReminderBotMessage = (event: SlackMessageEvent): boolean => {
   // bot_id가 있고, 해당 ID가 REMINDER_BOT_ID와 같은 경우
-  return event.bot_id === REMINDER_BOT_ID;
+  if (REMINDER_BOT_ID && event.bot_id === REMINDER_BOT_ID) {
+    return true;
+  }
+
+  // 특수 케이스: 리마인더봇의 특정 패턴 메시지도 식별
+  // 리마인더봇 메시지 패턴 확인 (예: 특정 형식의 메시지)
+  if (event.text && event.text.includes('Reminder:')) {
+    return true;
+  }
+
+  // 추가 패턴: 메시지의 app_id나 다른 요소 확인
+  if (event.blocks && Array.isArray(event.blocks)) {
+    for (const block of event.blocks) {
+      if (block.app_id === REMINDER_BOT_ID) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 };
 
 // 메시지에서 리마인더봇이 언급한 주요 대상 사용자 식별
@@ -158,6 +176,8 @@ export const hasMention = (text: string): boolean => {
 
 // 메시지에서 첫 번째 멘션된 사용자 ID 추출
 export const extractFirstMentionedUser = (text: string): string | null => {
+  if (!text) return null;
+
   const matches = text.match(MENTION_PATTERN);
   if (!matches || matches.length === 0) {
     return null;
@@ -170,8 +190,15 @@ export const extractFirstMentionedUser = (text: string): string | null => {
 
 // 메시지에서 모든 멘션된 사용자 ID 추출
 export const extractAllMentionedUsers = (text: string): string[] => {
-  const matches = [...text.matchAll(MENTION_PATTERN)];
-  return matches.map((match) => match[1]);
+  if (!text) return [];
+
+  try {
+    const matches = [...text.matchAll(MENTION_PATTERN)];
+    return matches.map((match) => match[1]);
+  } catch (error) {
+    console.error('Failed to extract mentioned users:', error);
+    return [];
+  }
 };
 
 // 특정 사용자가 멘션되었는지 확인
