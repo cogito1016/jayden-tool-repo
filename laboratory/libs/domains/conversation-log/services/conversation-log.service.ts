@@ -118,13 +118,14 @@ export class ConversationLogService {
         is_reminder_thread: isReminderBot || isReminderBotParent(messageEvent),
         is_mention: mentionedUsers.length > 0,
         mentioned_user: firstMentionedUser,
-        mentioned_users: mentionedUsers, // 모든 멘션된 사용자 목록
+        mentioned_users: JSON.stringify(mentionedUsers), // JSON 문자열로 변환
         is_reminder_target: isTargetInThread, // 이 사용자가 리마인더 타겟인지 여부
         reminder_target_user: reminderTargetUser, // 리마인더 타겟 사용자
-        authorization_users:
-          event.authorizations?.map((auth) => auth.user_id) || // 권한 있는 사용자들
-          event.authed_users || // 이전 버전 호환
-          [],
+        authorization_users: JSON.stringify(
+          event.authorizations?.map((auth) => auth.user_id) ||
+            event.authed_users ||
+            [],
+        ), // JSON 문자열로 변환
       };
 
       // 저장
