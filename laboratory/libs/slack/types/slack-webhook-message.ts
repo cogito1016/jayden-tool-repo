@@ -58,6 +58,7 @@ interface SlackEventCallback extends SlackEventBase {
   event_context?: string;
   context_team_id?: string;
   context_enterprise_id?: string | null;
+  authed_users?: string[]; // 이전 버전 호환성을 위해 유지
 }
 
 // 모든 이벤트 타입을 하나로 통합
@@ -85,6 +86,32 @@ export const isThreadMessage = (event: SlackMessageEvent): boolean => {
 // 리마인더봇 메시지인지 확인하는 함수
 export const isReminderBotParent = (event: SlackMessageEvent): boolean => {
   return !!event.parent_user_id && event.parent_user_id === REMINDER_BOT_ID;
+};
+
+// 리마인더봇이 생성한 원본 메시지인지 확인하는 함수
+export const isReminderBotMessage = (event: SlackMessageEvent): boolean => {
+  return event.bot_id === REMINDER_BOT_ID;
+};
+
+// 메시지에서 리마인더봇이 언급한 주요 대상 사용자 식별
+export const extractReminderTargetUser = (
+  event: SlackMessageEvent,
+): string | null => {
+  // 리마인더봇 메시지가 아니면 null 반환
+  if (!isReminderBotMessage(event)) {
+    return null;
+  }
+
+  // 메시지에서 첫 번째 멘션을 대상 사용자로 간주
+  return extractFirstMentionedUser(event.text);
+};
+
+// 스레드 참여자가 대상 사용자인지 확인하는 함수
+export const isTargetUser = (
+  threadTargetUserId: string,
+  userId: string,
+): boolean => {
+  return threadTargetUserId === userId;
 };
 
 // 멘션 관련 유틸리티 함수 추가
