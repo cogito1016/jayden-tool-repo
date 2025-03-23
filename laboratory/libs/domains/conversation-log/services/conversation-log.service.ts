@@ -12,6 +12,7 @@ import {
   isReminderBotMessage,
   isReminderBotParent,
   isThreadMessage,
+  REMINDER_BOT_ID,
   SlackMessageEvent,
   SlackWebhookEvent,
 } from 'libs/slack/types/slack-webhook-message';
@@ -49,8 +50,28 @@ export class ConversationLogService {
         return null;
       }
 
-      // 리마인더봇이 첫 번째로 멘션한 사용자를 타겟으로 간주
-      return originMessage.mentioned_users?.[0] || null;
+      // mentioned_user 사용 (첫 번째 멘션된 사용자)
+      if (originMessage.mentioned_user) {
+        return originMessage.mentioned_user;
+      }
+
+      // mentioned_users가 있으면 파싱해서 첫 번째 요소 반환
+      if (originMessage.mentioned_users) {
+        try {
+          const mentionedUsers = JSON.parse(originMessage.mentioned_users);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return Array.isArray(mentionedUsers) && mentionedUsers.length > 0
+            ? mentionedUsers[0]
+            : null;
+        } catch (err) {
+          this.logger.warn('Failed to parse mentioned_users JSON', {
+            mentioned_users: originMessage.mentioned_users,
+            error: err.message,
+          });
+        }
+      }
+
+      return null;
     } catch (error) {
       this.logger.error(
         `Failed to identify thread target user: ${error.message}`,
@@ -70,6 +91,14 @@ export class ConversationLogService {
 
     // 봇 메시지 처리 (리마인더봇 메시지는 저장, 다른 봇은 무시)
     const isReminderBot = isReminderBotMessage(messageEvent);
+    this.logger.verbose(
+      `[이벤트 처리] 봇 메시지 체크: ${isReminderBot ? '리마인더봇' : messageEvent.bot_id ? '다른 봇' : '사용자'}`,
+      {
+        bot_id: messageEvent.bot_id,
+        reminder_bot_id: REMINDER_BOT_ID,
+      },
+    );
+
     if (messageEvent.bot_id && !isReminderBot) {
       return false;
     }
@@ -90,19 +119,63 @@ export class ConversationLogService {
       let reminderTargetUser: string | null = null;
       let isTargetInThread = false;
 
+      // 디버깅을 위한 추가 로깅
+      this.logger.verbose('[이벤트 처리] 처리 중인 메시지 정보', {
+        user: messageEvent.user,
+        is_thread: isThreadMessage(messageEvent),
+        thread_ts: messageEvent.thread_ts,
+        is_reminder_bot: isReminderBot,
+        mentioned_users: mentionedUsers,
+        message_text: messageEvent.text,
+        blocks: messageEvent.blocks,
+      });
+
       // 스레드 메시지인 경우, 원본 스레드의 타겟 사용자 식별
       if (isThreadMessage(messageEvent)) {
         if (messageEvent.thread_ts) {
+          this.logger.verbose('[이벤트 처리] 스레드 원본 메시지 조회 시도', {
+            thread_ts: messageEvent.thread_ts,
+          });
+
           reminderTargetUser = await this.identifyThreadTargetUser(
             messageEvent.thread_ts,
           );
+
+          // 타겟 사용자 식별 결과 로깅
+          this.logger.verbose('[이벤트 처리] 스레드 타겟 사용자 식별 결과', {
+            thread_ts: messageEvent.thread_ts,
+            reminder_target_user: reminderTargetUser,
+            current_user: messageEvent.user,
+          });
+
           // 현재 메시지 작성자가 타겟 사용자와 동일한지 확인
           isTargetInThread =
             !!reminderTargetUser && reminderTargetUser === messageEvent.user;
+
+          this.logger.verbose('[이벤트 처리] 타겟 사용자 비교 결과', {
+            is_target_in_thread: isTargetInThread,
+            reminder_target_user: reminderTargetUser,
+            current_user: messageEvent.user,
+            equal: reminderTargetUser === messageEvent.user,
+          });
         }
       } else if (isReminderBot) {
         // 리마인더봇 원본 메시지인 경우, 타겟 사용자 바로 추출
+        this.logger.verbose('[이벤트 처리] 리마인더봇 원본 메시지 분석', {
+          bot_id: messageEvent.bot_id,
+          text: messageEvent.text,
+          has_blocks:
+            !!messageEvent.blocks && Array.isArray(messageEvent.blocks),
+        });
+
         reminderTargetUser = extractReminderTargetUser(messageEvent);
+
+        this.logger.verbose(
+          '[이벤트 처리] 리마인더봇 원본 메시지의 타겟 사용자',
+          {
+            reminder_target_user: reminderTargetUser,
+          },
+        );
       }
 
       // 로그 데이터 생성 (확장된 필드 포함)
@@ -127,6 +200,13 @@ export class ConversationLogService {
             [],
         ), // JSON 문자열로 변환
       };
+
+      // 최종 저장 데이터 로깅
+      this.logger.debug('저장될 대화 로그 데이터', {
+        message_ts: logData.message_ts,
+        is_reminder_target: logData.is_reminder_target,
+        reminder_target_user: logData.reminder_target_user,
+      });
 
       // 저장
       await this.conversationLogRepository.create(logData);

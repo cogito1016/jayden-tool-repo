@@ -90,6 +90,7 @@ export const isReminderBotParent = (event: SlackMessageEvent): boolean => {
 
 // 리마인더봇이 생성한 원본 메시지인지 확인하는 함수
 export const isReminderBotMessage = (event: SlackMessageEvent): boolean => {
+  // bot_id가 있고, 해당 ID가 REMINDER_BOT_ID와 같은 경우
   return event.bot_id === REMINDER_BOT_ID;
 };
 
@@ -102,7 +103,39 @@ export const extractReminderTargetUser = (
     return null;
   }
 
+  // 디버깅용 로그 (개발 완료 후 제거)
+  console.log('리마인더봇 메시지 분석:', {
+    text: event.text,
+    bot_id: event.bot_id,
+    reminder_bot_id: REMINDER_BOT_ID,
+  });
+
+  // 메시지 텍스트 유효성 검사
+  if (!event.text) {
+    return null;
+  }
+
   // 메시지에서 첫 번째 멘션을 대상 사용자로 간주
+  // 1. 메시지 블록에서 멘션 확인
+  if (event.blocks && Array.isArray(event.blocks)) {
+    // 블록 내 멘션 확인
+    for (const block of event.blocks) {
+      if (block.elements && Array.isArray(block.elements)) {
+        for (const element of block.elements) {
+          if (element.elements && Array.isArray(element.elements)) {
+            for (const subElement of element.elements) {
+              if (subElement.type === 'user' && subElement.user_id) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                return subElement.user_id;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 2. 텍스트에서 멘션 추출
   return extractFirstMentionedUser(event.text);
 };
 
