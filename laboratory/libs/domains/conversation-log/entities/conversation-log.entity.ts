@@ -10,10 +10,10 @@ export interface ConversationLog {
   is_thread_reply: boolean;
   is_mention: boolean;
   mentioned_user?: string | null;
-  mentioned_users?: string[];
+  mentioned_users?: string;
   is_reminder_thread: boolean;
   is_reminder_target?: boolean;
   reminder_target_user?: string | null;
-  authorization_users?: string[];
+  authorization_users?: string;
   created_at?: Date;
 }
