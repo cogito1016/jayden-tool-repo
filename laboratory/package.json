@@ -16,6 +16,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/laboratory/main",
     "api:local": "nest start api --watch --env-file=./env/.env.local",
+    "jobs:local": "nest start jobs --watch --env-file=./env/.env.local",
     "start:jobs": "TZ=Asia/Seoul nest start jobs --watch",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
