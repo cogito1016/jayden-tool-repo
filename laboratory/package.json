@@ -26,6 +26,7 @@
     "test:e2e": "jest --config ./apps/laboratory/test/jest-e2e.json"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@nestjs/cache-manager": "^3.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",
@@ -89,7 +90,8 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
     ]
   }
 }
