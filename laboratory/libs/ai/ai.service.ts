@@ -5,6 +5,7 @@ import {
   GenerateContentResult,
 } from '@google/generative-ai';
 import { ConversationLog } from '../domains/conversation-log/entities/conversation-log.entity';
+import { aiApiKey } from 'env/Token';
 
 @Injectable()
 export class AiService {
@@ -12,7 +13,7 @@ export class AiService {
   private model: GenerativeModel;
 
   constructor() {
-    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    this.genAI = new GoogleGenerativeAI(aiApiKey || '');
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
   }
 

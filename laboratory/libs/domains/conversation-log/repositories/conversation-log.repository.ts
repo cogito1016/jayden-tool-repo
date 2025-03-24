@@ -87,4 +87,21 @@ export class ConversationLogRepository extends BaseRepository<ConversationLog> {
     const count = reminderMessages?.count;
     return count ? Number(count) > 0 : false;
   }
+
+  /**
+   * 지난 주의 리마인더 스레드를 조회합니다.
+   * @param startDate 조회 시작일
+   * @returns 지난 주의 리마인더 스레드 목록
+   */
+  async findLastWeekReminderThreads(
+    startDate: Date,
+  ): Promise<ConversationLog[]> {
+    const threads = await this.knex(this.tableName)
+      .where('is_reminder_thread', true)
+      .andWhere('created_at', '>=', startDate)
+      .andWhere('created_at', '<=', new Date())
+      .orderBy('created_at', 'desc');
+
+    return threads as ConversationLog[];
+  }
 }

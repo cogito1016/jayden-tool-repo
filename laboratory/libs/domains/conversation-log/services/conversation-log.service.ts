@@ -225,4 +225,25 @@ export class ConversationLogService {
       );
     return userThreads;
   }
+
+  /**
+   * 지난 주의 리마인더 스레드를 조회합니다.
+   * @returns 지난 주의 리마인더 스레드 목록
+   */
+  async getLastWeekReminderThreads(): Promise<ConversationLog[]> {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const lastWeekThreads =
+      await this.conversationLogRepository.findLastWeekReminderThreads(
+        oneWeekAgo,
+      );
+
+    this.logger.verbose('[리마인더 스레드 조회] 지난 주 스레드 조회 결과', {
+      threadCount: lastWeekThreads.length,
+      startDate: oneWeekAgo.toISOString(),
+    });
+
+    return lastWeekThreads;
+  }
 }
