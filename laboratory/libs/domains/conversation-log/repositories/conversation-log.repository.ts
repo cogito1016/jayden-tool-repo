@@ -1,8 +1,8 @@
 // libs/domains/repositories/conversation-log.repository.ts
 import { Injectable } from '@nestjs/common';
-import { BaseRepository } from 'libs/domains/base.repository';
+import { BaseRepository } from '@libs/domains/base.repository';
 import { ConversationLog } from '../entities/conversation-log.entity';
-import { REMINDER_BOT_ID } from 'libs/slack/types/slack-webhook-message';
+import { REMINDER_BOT_ID } from '@libs/slack/types/slack-webhook-message';
 
 @Injectable()
 export class ConversationLogRepository extends BaseRepository<ConversationLog> {

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
-import { MemberModule } from 'libs/domains/member/member.module';
-import { ConversationLogModule } from 'libs/domains/conversation-log/conversation-log.module';
+import { MemberModule } from '@libs/domains/member/member.module';
+import { ConversationLogModule } from '@libs/domains/conversation-log/conversation-log.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { ConfigModule } from '@nestjs/config';

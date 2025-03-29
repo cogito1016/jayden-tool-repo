@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConversationLogRepository } from '../repositories/conversation-log.repository';
 import { ConversationLog } from '../entities/conversation-log.entity';
 
-import { MemberRepository } from 'libs/domains/member/repositories/member.repository';
+import { MemberRepository } from '@libs/domains/member/repositories/member.repository';
 import {
   extractAllMentionedUsers,
   extractFirstMentionedUser,
@@ -15,7 +15,7 @@ import {
   REMINDER_BOT_ID,
   SlackMessageEvent,
   SlackWebhookEvent,
-} from 'libs/slack/types/slack-webhook-message';
+} from '@libs/slack/types/slack-webhook-message';
 
 @Injectable()
 export class ConversationLogService {

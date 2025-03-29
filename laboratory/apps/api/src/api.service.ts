@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { ConversationLogService } from 'libs/domains/conversation-log/services/conversation-log.service';
-import { MemberEntity } from 'libs/domains/member/entities/member.entity';
-import { MemberService } from 'libs/domains/member/services/member.service';
-import { LoggerUtil } from 'libs/common/utils/logger.util';
+import { ConversationLogService } from '@libs/domains/conversation-log/services/conversation-log.service';
+import { MemberEntity } from '@libs/domains/member/entities/member.entity';
+import { MemberService } from '@libs/domains/member/services/member.service';
+import { LoggerUtil } from '@libs/common/utils/logger.util';
 import {
   SlackWebhookEvent,
   URL_VERIFICATION,
-} from 'libs/slack/types/slack-webhook-message';
+} from '@libs/slack/types/slack-webhook-message';
 
 @Injectable()
 export class ApiService {
