@@ -125,15 +125,6 @@ export class ConversationLogService {
       return false;
     }
 
-    if (isReminderBot) {
-      // 리마인더 봇 메시지는 저장하지 않음
-      this.logger.verbose('[이벤트 처리] 리마인더 봇 메시지 무시', {
-        bot_id: messageEvent.bot_id,
-        text: messageEvent.text,
-      });
-      return false;
-    }
-
     try {
       // 멤버 코드 조회
       const member = await this.memberRepository.findBySlackMemberId(
