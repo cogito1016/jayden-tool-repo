@@ -17,6 +17,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@libs/*": ["libs/*"],
+      "@apps/*": ["apps/*"],
+      "@env/*": ["env/*"]
+    }
   }
 }
