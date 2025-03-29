@@ -35,20 +35,17 @@ export class AiService {
     // AI가 이해하기 쉬운 형태로 대화 기록 변환
     const formattedLogs = conversationLogs.map((log) => ({
       timestamp: log.message_ts,
-      user: log.slack_member_id,
       message: log.message,
-      isReminderBot: log.parent_user_id === process.env.REMINDER_BOT_ID,
-      isTargetUser: log.is_reminder_target,
     }));
 
     const prompt = `
-당신은 동기부여 전문가입니다. 다음 대화 기록을 바탕으로 100자 이내의 짧고 강력한 동기부여 메시지를 생성해주세요.
+당신은 동기부여 전문가입니다. 다음 대화 기록을 바탕으로 동기부여 메시지를 생성해주세요.
 
 대화 기록:
 ${JSON.stringify(formattedLogs, null, 2)}
 
 요구사항:
-1. 메시지는 100자 이내로 작성
+1. 메시지는 500자 이내로 작성
 2. 긍정적이고 동기부여가 되는 톤 사용
 3. 구체적인 목표나 성과를 언급
 4. 한국어로 작성
