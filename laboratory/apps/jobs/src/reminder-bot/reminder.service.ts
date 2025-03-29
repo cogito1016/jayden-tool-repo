@@ -6,18 +6,21 @@ import { SlackService } from '@libs/slack/slack.service';
 import { ConversationLogService } from '@libs/domains/conversation-log/services/conversation-log.service';
 import { AiService } from '@libs/ai/ai.service';
 import { WebClient } from '@slack/web-api';
+import { ConversationLog } from '@libs/domains/conversation-log/entities/conversation-log.entity';
 
 @Injectable()
 export class ReminderService {
   private readonly logger = new Logger(ReminderService.name);
-  private readonly client: WebClient;
 
   constructor(
     private readonly slackService: SlackService,
     private readonly conversationLogService: ConversationLogService,
     private readonly aiService: AiService,
-  ) {
-    this.client = new WebClient(process.env.SLACK_BOT_TOKEN);
+  ) {}
+
+  async onApplicationBootstrap() {
+    // await this.sendProjectListReminder();
+    await this.sendAiBasedReminder();
   }
 
   /**
@@ -81,34 +84,89 @@ export class ReminderService {
         `[AI 리마인더] ${lastWeekThreads.length}개의 스레드 처리 시작`,
       );
 
-      for (const thread of lastWeekThreads) {
+      // 스레드 목록을 슬랙 멤버 ID별로 그룹화
+      const lastWeekThreadsBySlackMemberIds = new Map<
+        string,
+        ConversationLog[]
+      >();
+
+      lastWeekThreads.forEach((thread) => {
+        if (!thread.member_code) {
+          return;
+        }
+
+        const slackMemberId = thread.slack_member_id;
+        if (!lastWeekThreadsBySlackMemberIds.has(slackMemberId)) {
+          lastWeekThreadsBySlackMemberIds.set(slackMemberId, [thread]);
+        } else {
+          lastWeekThreadsBySlackMemberIds.get(slackMemberId)?.push(thread);
+        }
+      });
+
+      const reminderBotMentionedThreads = lastWeekThreads.filter(
+        (thread) =>
+          thread.member_code === '' &&
+          thread.is_mention &&
+          thread.mentioned_user,
+      );
+
+      const reminderBotMentionedThreadsBySlackMemberIds = new Map<
+        string,
+        ConversationLog[]
+      >();
+
+      reminderBotMentionedThreads.forEach((thread) => {
+        const slackMemberId = thread.mentioned_user;
+        if (!slackMemberId) {
+          return;
+        }
+
+        if (!reminderBotMentionedThreadsBySlackMemberIds.has(slackMemberId)) {
+          reminderBotMentionedThreadsBySlackMemberIds.set(slackMemberId, [
+            thread,
+          ]);
+        } else {
+          reminderBotMentionedThreadsBySlackMemberIds
+            .get(slackMemberId)
+            ?.push(thread);
+        }
+      });
+
+      for (const slackMemberId of lastWeekThreadsBySlackMemberIds.keys()) {
         try {
-          if (!thread.thread_ts || !thread.channel_id) {
+          const threads = lastWeekThreadsBySlackMemberIds.get(slackMemberId);
+          if (!threads) {
             this.logger.warn(
-              `[AI 리마인더] 스레드 정보 누락 - thread_ts: ${thread.thread_ts}, channel_id: ${thread.channel_id}`,
+              `[AI 리마인더] 스레드 목록 누락 - slack_member_id: ${slackMemberId}`,
             );
             continue;
           }
 
-          // 2. 스레드의 모든 메시지 조회
-          const threadMessages =
-            await this.conversationLogService.getThreadMessages(
-              thread.thread_ts,
-            );
-
           // 3. AI 동기부여 메시지 생성
           const aiMessage =
-            await this.aiService.generateMotivationalMessage(threadMessages);
+            await this.aiService.generateMotivationalMessage(threads);
 
           // 4. AI 메시지를 스레드에 추가
-          await this.client.chat.postMessage({
-            channel: thread.channel_id,
-            thread_ts: thread.thread_ts,
-            text: aiMessage,
-          });
+          const aiMessageTarget =
+            reminderBotMentionedThreadsBySlackMemberIds.get(slackMemberId) ?? [
+              {
+                channel_id: '',
+                thread_ts: '',
+                message_ts: '',
+              },
+            ];
+          console.log(aiMessage);
+
+          if (aiMessageTarget) {
+            await this.slackService.postMsg({
+              conversationId: aiMessageTarget[0].channel_id,
+              thread_ts: aiMessageTarget[0].message_ts ?? '',
+              text: aiMessage,
+            });
+          }
 
           this.logger.verbose(
-            `[AI 리마인더] AI 메시지 추가 완료 - 스레드: ${thread.thread_ts}`,
+            `[AI 리마인더] AI 메시지 추가 완료 - 스레드: ${aiMessageTarget[0].thread_ts}`,
           );
         } catch (error) {
           this.logger.error(
