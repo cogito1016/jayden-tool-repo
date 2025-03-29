@@ -110,7 +110,7 @@ export class ConversationLogService {
       bot_id_length: REMINDER_BOT_ID ? REMINDER_BOT_ID.length : 0,
     });
 
-    // 봇 메시지 처리 (리마인더봇 메시지는 저장, 다른 봇은 무시)
+    // 봇 메시지 처리
     const isReminderBot = isReminderBotMessage(messageEvent);
     this.logger.verbose(
       `[이벤트 처리] 봇 메시지 체크: ${isReminderBot ? '리마인더봇' : messageEvent.bot_id ? '다른 봇' : '사용자'}`,
@@ -122,6 +122,15 @@ export class ConversationLogService {
     );
 
     if (messageEvent.bot_id && !isReminderBot) {
+      return false;
+    }
+
+    if (isReminderBot) {
+      // 리마인더 봇 메시지는 저장하지 않음
+      this.logger.verbose('[이벤트 처리] 리마인더 봇 메시지 무시', {
+        bot_id: messageEvent.bot_id,
+        text: messageEvent.text,
+      });
       return false;
     }
 
