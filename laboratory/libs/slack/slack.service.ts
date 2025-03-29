@@ -23,6 +23,7 @@ export class SlackService {
         text: msg.text,
         channel: msg.conversationId ?? testConversationId,
         attachments: msg.attachments,
+        thread_ts: msg.thread_ts,
       })) as SlackMessageResponse;
 
       this.logger.log(
