@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { JobsModule } from './jobs.module';
-import { testConversationId } from 'env/Token';
-import { SlackService } from 'libs/slack/slack.service';
+import { testConversationId } from '@env/Token';
+import { SlackService } from '@libs/slack/slack.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(JobsModule);

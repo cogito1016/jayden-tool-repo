@@ -4,8 +4,8 @@ import {
   GenerativeModel,
   GenerateContentResult,
 } from '@google/generative-ai';
-import { ConversationLog } from '../domains/conversation-log/entities/conversation-log.entity';
-import { aiApiKey } from '../../env/Token';
+import { ConversationLog } from '@libs/domains/conversation-log/entities/conversation-log.entity';
+import { aiApiKey } from '@env/Token';
 
 @Injectable()
 export class AiService {

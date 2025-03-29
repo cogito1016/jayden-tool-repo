@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { MemberObjectList } from 'env/MemberObjectList';
-import { conversationId } from 'env/Token';
-import { SlackService } from 'libs/slack/slack.service';
-import { ConversationLogService } from 'libs/domains/conversation-log/services/conversation-log.service';
-import { AiService } from 'libs/ai/ai.service';
+import { MemberObjectList } from '@env/MemberObjectList';
+import { conversationId } from '@env/Token';
+import { SlackService } from '@libs/slack/slack.service';
+import { ConversationLogService } from '@libs/domains/conversation-log/services/conversation-log.service';
+import { AiService } from '@libs/ai/ai.service';
 import { WebClient } from '@slack/web-api';
 
 @Injectable()
