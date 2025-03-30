@@ -18,11 +18,6 @@ export class ReminderService {
     private readonly aiService: AiService,
   ) {}
 
-  async onApplicationBootstrap() {
-    // await this.sendProjectListReminder();
-    await this.sendAiBasedReminder();
-  }
-
   /**
    * 매주 월요일 오전 8시에 실행되는 리마인더 메시지 발송
    */
