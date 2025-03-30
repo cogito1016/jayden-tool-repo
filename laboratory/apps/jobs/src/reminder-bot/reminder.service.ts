@@ -150,7 +150,9 @@ export class ReminderService {
                 message_ts: '',
               },
             ];
-          console.log(aiMessage);
+          this.logger.log(
+            `${slackMemberId} 멤버, 사용 메세지 수 ${threads.length}`,
+          );
 
           if (aiMessageTarget) {
             await this.slackService.postMsg({
