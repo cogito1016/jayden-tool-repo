@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MemberRepository } from './repositories/member.repository';
 import { MemberService } from './services/member.service';
 import { KnexModule } from 'nestjs-knex';
+import { environment } from '@libs/config/src';
 
 @Module({
   imports: [
@@ -10,10 +11,10 @@ import { KnexModule } from 'nestjs-knex';
         client: 'mysql2',
         useNullAsDefault: true,
         connection: {
-          host: process.env.DB_HOST,
-          user: process.env.DB_USERNAME,
-          password: process.env.DB_PASSWORD,
-          database: process.env.DB_DATABASE,
+          host: environment.database.host,
+          user: environment.database.username,
+          password: environment.database.password,
+          database: environment.database.database,
         },
       },
     }),

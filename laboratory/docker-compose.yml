@@ -10,6 +10,9 @@ services:
       - APP_NAME=jobs
       - PORT=3000
       - TZ=Asia/Seoul
+      - NODE_ENV=production
+    env_file:
+      - ./env/.env.production
     ports:
       - '3000:3000'
 
@@ -20,6 +23,9 @@ services:
     environment:
       - APP_NAME=laboratory
       - PORT=3002
+      - NODE_ENV=production
+    env_file:
+      - ./env/.env.production
     ports:
       - '3002:3002'
 
@@ -30,10 +36,8 @@ services:
     environment:
       - APP_NAME=api
       - PORT=3001
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE}
+      - NODE_ENV=production
+    env_file:
+      - ./env/.env.production
     ports:
       - '3001:3001'

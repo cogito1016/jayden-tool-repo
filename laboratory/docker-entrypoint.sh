@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# 환경변수 파일 로드
+if [ -f "/app/env/.env.production" ]; then
+  echo "Loading production environment variables..."
+  export $(cat /app/env/.env.production | xargs)
+else
+  echo "Warning: .env.production file not found"
+fi
+
 # $APP_NAME 환경변수에 따라 다른 앱 실행
 case "$APP_NAME" in
   "jobs")
