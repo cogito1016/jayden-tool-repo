@@ -5,6 +5,7 @@ export interface SlackMessageRequest {
   text: string;
   attachments?: MessageAttachment[];
   conversationId: string;
+  thread_ts?: string;
 }
 
 // 응답 타입 (Slack SDK의 타입 확장)

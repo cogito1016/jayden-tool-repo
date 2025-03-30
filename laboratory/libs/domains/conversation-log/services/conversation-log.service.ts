@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConversationLogRepository } from '../repositories/conversation-log.repository';
 import { ConversationLog } from '../entities/conversation-log.entity';
 
-import { MemberRepository } from 'libs/domains/member/repositories/member.repository';
+import { MemberRepository } from '@libs/domains/member/repositories/member.repository';
 import {
   extractAllMentionedUsers,
   extractFirstMentionedUser,
@@ -15,7 +15,7 @@ import {
   REMINDER_BOT_ID,
   SlackMessageEvent,
   SlackWebhookEvent,
-} from 'libs/slack/types/slack-webhook-message';
+} from '@libs/slack/types/slack-webhook-message';
 
 @Injectable()
 export class ConversationLogService {
@@ -110,7 +110,7 @@ export class ConversationLogService {
       bot_id_length: REMINDER_BOT_ID ? REMINDER_BOT_ID.length : 0,
     });
 
-    // 봇 메시지 처리 (리마인더봇 메시지는 저장, 다른 봇은 무시)
+    // 봇 메시지 처리
     const isReminderBot = isReminderBotMessage(messageEvent);
     this.logger.verbose(
       `[이벤트 처리] 봇 메시지 체크: ${isReminderBot ? '리마인더봇' : messageEvent.bot_id ? '다른 봇' : '사용자'}`,
@@ -224,5 +224,26 @@ export class ConversationLogService {
         slackMemberId,
       );
     return userThreads;
+  }
+
+  /**
+   * 지난 주의 리마인더 스레드를 조회합니다.
+   * @returns 지난 주의 리마인더 스레드 목록
+   */
+  async getLastWeekReminderThreads(): Promise<ConversationLog[]> {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const lastWeekThreads =
+      await this.conversationLogRepository.findLastWeekReminderThreads(
+        oneWeekAgo,
+      );
+
+    this.logger.verbose('[리마인더 스레드 조회] 지난 주 스레드 조회 결과', {
+      threadCount: lastWeekThreads.length,
+      startDate: oneWeekAgo.toISOString(),
+    });
+
+    return lastWeekThreads;
   }
 }

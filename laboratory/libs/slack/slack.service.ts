@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WebClient } from '@slack/web-api';
-import { testConversationId, token } from 'env/Token';
+import { testConversationId, token } from '@env/Token';
 import {
   SlackMessageRequest,
   SlackMessageResponse,
@@ -23,6 +23,7 @@ export class SlackService {
         text: msg.text,
         channel: msg.conversationId ?? testConversationId,
         attachments: msg.attachments,
+        thread_ts: msg.thread_ts,
       })) as SlackMessageResponse;
 
       this.logger.log(

@@ -1,20 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
-import { MemberModule } from 'libs/domains/member/member.module';
-import { ConversationLogModule } from 'libs/domains/conversation-log/conversation-log.module';
+import { MemberModule } from '@libs/domains/member/member.module';
+import { ConversationLogModule } from '@libs/domains/conversation-log/conversation-log.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
-import { ConfigModule } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule } from '@libs/config/src/config.module';
 
 @Module({
   imports: [
-    // 환경 변수 설정
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: './env/.env.local',
-    }),
+    ConfigModule,
 
     // 캐싱 설정
     CacheModule.register({
