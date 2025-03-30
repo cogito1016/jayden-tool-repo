@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { MemberObjectList } from '@env/MemberObjectList';
-import { conversationId } from '@env/Token';
+import { environment } from '@libs/config/src/configuration';
 import { SlackService } from '@libs/slack/slack.service';
 import { ConversationLogService } from '@libs/domains/conversation-log/services/conversation-log.service';
 import { AiService } from '@libs/ai/ai.service';
-import { WebClient } from '@slack/web-api';
 import { ConversationLog } from '@libs/domains/conversation-log/entities/conversation-log.entity';
 
 @Injectable()
@@ -51,7 +50,7 @@ export class ReminderService {
           attachments: data.project.map((project) => ({
             text: project,
           })),
-          conversationId: conversationId,
+          conversationId: environment.reminder.conversationId ?? '',
         };
         await this.slackService.postMsg(message);
       }
