@@ -49,12 +49,6 @@ Object.keys(configObject).forEach((key) => {
   );
 });
 
-// 타입추론을 위해 환경변수 중 하나라도 undefined인 경우 종료
-if (Object.values(configObject).some((value) => value === undefined)) {
-  console.error('❌ Environment variables are missing');
-  process.exit(1);
-}
-
 // 환경 변수 유효성 검사
 validate(configObject);
 
