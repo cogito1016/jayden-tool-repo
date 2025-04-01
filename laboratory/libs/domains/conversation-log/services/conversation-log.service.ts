@@ -103,6 +103,9 @@ export class ConversationLogService {
 
     const messageEvent = event.event;
 
+    this.logger.verbose('messageEvent');
+    this.logger.verbose(messageEvent);
+
     // 리마인더봇 ID 로깅 (디버깅용)
     this.logger.verbose('[이벤트 처리] 리마인더봇 ID 확인', {
       reminder_bot_id: REMINDER_BOT_ID,
