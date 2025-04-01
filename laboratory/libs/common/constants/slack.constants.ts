@@ -1,9 +1,11 @@
+import { environment } from '@libs/config/src';
+
 /**
  * Slack 관련 상수 정의
  */
 
 // 리마인더 봇 ID
-export const REMINDER_BOT_ID = process.env.REMINDER_BOT_ID;
+export const REMINDER_BOT_ID = environment.reminder.botId;
 
 // 슬랙 이벤트 타입
 export const SLACK_EVENT_TYPES = {

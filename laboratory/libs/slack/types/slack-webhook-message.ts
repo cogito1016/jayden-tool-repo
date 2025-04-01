@@ -1,9 +1,11 @@
+import { environment } from '@libs/config/src';
+
 // 기본 이벤트 인터페이스
 export const URL_VERIFICATION = 'url_verification';
 export const MESSAGE = 'message';
 export const EVENT_CALLBACK = 'event_callback';
 
-export const REMINDER_BOT_ID = process.env.REMINDER_BOT_ID;
+export const REMINDER_BOT_ID = environment.reminder.botId;
 
 interface SlackEventBase {
   token: string;
